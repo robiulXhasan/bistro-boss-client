@@ -1,6 +1,6 @@
 const SectionHeading = ({ heading, subHeading }) => {
   return (
-    <div className="text-center w-1/4 mx-auto space-y-1 my-10">
+    <div className="text-center md:w-1/3 mx-auto space-y-1 my-10">
       <p className="text-[#D99904]">---{subHeading}---</p>
       <div className="divider"></div>
       <h1 className="text-4xl">{heading}</h1>
