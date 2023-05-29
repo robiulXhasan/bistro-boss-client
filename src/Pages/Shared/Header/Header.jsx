@@ -4,27 +4,27 @@ const Header = () => {
   const navItems = (
     <>
       <li>
-        <Link>HOME</Link>
+        <Link to="/">HOME</Link>
       </li>
       <li>
-        <Link>CONTACT US</Link>
+        <Link to="/contact">CONTACT US</Link>
       </li>
       <li>
-        <Link>DASHBOARD</Link>
+        <Link to="/dashboard">DASHBOARD</Link>
       </li>
       <li>
-        <Link>OUR MENU </Link>
+        <Link to="/menu">OUR MENU </Link>
       </li>
       <li>
-        <Link>OUR SHOP</Link>
+        <Link to="/shop">OUR SHOP</Link>
       </li>
       <li>
-        <Link>LOGIN</Link>
+        <Link to="/login">LOGIN</Link>
       </li>
     </>
   );
   return (
-    <div className="navbar fixed z-10 bg-opacity-30 bg-black  text-white px-5">
+    <div className="navbar fixed z-10 bg-opacity-30 md:px-[8%] bg-black  text-white">
       <div className="navbar-start">
         <div className="dropdown">
           <label tabIndex={0} className="btn btn-ghost lg:hidden">
