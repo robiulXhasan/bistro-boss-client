@@ -2,6 +2,7 @@ import React from "react";
 import useMenu from "../../Hooks/useMenu";
 import MenuItems from "../Shared/MenuItems/MenuItems";
 import PageCover from "../Shared/PageCover/PageCover";
+import { Link } from "react-router-dom";
 
 const MenuCategory = ({ items, title, coverImg }) => {
   const [loading] = useMenu();
@@ -26,9 +27,12 @@ const MenuCategory = ({ items, title, coverImg }) => {
           ))}
         </div>
         <div className="text-center">
-          <button className="btn btn-outline mt-10  my-4 border-0 border-b-4 uppercase">
+          <Link
+            to={`/shop/${title}`}
+            className="btn btn-outline mt-10  my-4 border-0 border-b-4 uppercase"
+          >
             Order Your favourite food
-          </button>
+          </Link>
         </div>
       </div>
     </div>
