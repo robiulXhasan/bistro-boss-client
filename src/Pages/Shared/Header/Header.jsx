@@ -1,6 +1,18 @@
-import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../Providers/AuthProvider";
 
 const Header = () => {
+  const { user, logOut } = useContext(AuthContext);
+  console.log(user);
+  const navigate = useNavigate();
+  const handleLogOut = () => {
+    logOut()
+      .then((res) => {
+        navigate("/");
+      })
+      .catch(error);
+  };
   const navItems = (
     <>
       <li>
@@ -19,7 +31,7 @@ const Header = () => {
         <Link to={`/shop/Salads`}>OUR SHOP</Link>
       </li>
       <li>
-        <Link to="/login">LOGIN</Link>
+        {user ? <Link onClick={handleLogOut}>SIGN OUT</Link> : <Link to="/login">SIGN IN</Link>}
       </li>
     </>
   );
@@ -60,11 +72,29 @@ const Header = () => {
           <ul className="menu menu-horizontal font-medium">{navItems}</ul>
         </div>
 
-        <img
-          className="w-10 h-10 rounded-full"
-          src="https://images.unsplash.com/photo-1566753323558-f4e0952af115?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=721&q=80"
-          alt=""
-        />
+        {user ? (
+          user?.photoURL ? (
+            <img
+              className="w-10 h-10 rounded-full cursor-pointer"
+              data-toggle="tooltip"
+              title={user?.displayName}
+              placement="bottom"
+              src={`${user?.photoURL}`}
+              alt=""
+            />
+          ) : (
+            <img
+              className="w-10 h-10 rounded-full cursor-pointer"
+              data-toggle="tooltip"
+              title={user?.displayName}
+              placement="bottom"
+              src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1685422406~exp=1685423006~hmac=e59b31bb2d641320f0cbcf5687b1c566606e735e651c1a9963ef78acdf217c56"
+              alt=""
+            />
+          )
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

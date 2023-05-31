@@ -1,19 +1,42 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
+
+import { Link, useNavigate } from "react-router-dom";
 import loginBanner from "../../assets/others/authentication.png";
 import login from "../../assets/others/authentication2.png";
 import { CiFacebook } from "react-icons/ci";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithub } from "react-icons/vsc";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 const Register = () => {
-  const handleSignUp = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    const name = form.name.value;
-    const email = form.email.value;
-    const password = form.password.value;
-    console.log(email, password);
+  const { createUser, profileUpdate, googleSignIn } = useContext(AuthContext);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = (data) => {
+    createUser(data.email, data.password)
+      .then((result) => {
+        profileUpdate(data.name)
+          .then((result) => {
+            navigate("/");
+          })
+          .catch((error) => setError(error.message));
+      })
+      .catch((error) => setError(error.message));
+  };
+
+  const handleGoogleSignIn = () => {
+    googleSignIn()
+      .then((result) => {
+        navigate("/");
+      })
+      .catch((error) => setError(error.message));
   };
   return (
     <div className="hero min-h-screen " style={{ backgroundImage: `url(${loginBanner})` }}>
@@ -22,7 +45,7 @@ const Register = () => {
         style={{ backgroundImage: `url(${loginBanner})` }}
       >
         <img className="md:w-1/2" src={login} alt="" />
-        <form onSubmit={handleSignUp} className="md:w-2/3 text-black space-y-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="md:w-2/3 text-black space-y-3">
           <h1 className="text-2xl text-black font-semibold uppercase"> Sign Up</h1>
           <div className="form-control">
             <label className="label">
@@ -30,11 +53,15 @@ const Register = () => {
             </label>
             <input
               type="text"
-              name="name"
-              required
+              {...register("name", { required: true })}
               placeholder="Enter Name"
               className="input input-bordered "
             />
+            {errors.name?.type === "required" && (
+              <p className="text-red-600 text-start text-sm" role="alert">
+                Name is required
+              </p>
+            )}
           </div>
           <div className="form-control">
             <label className="label">
@@ -42,11 +69,16 @@ const Register = () => {
             </label>
             <input
               type="email"
-              name="email"
-              required
+              {...register("email", { required: "Email Address is required" })}
+              aria-invalid={errors.email ? "true" : "false"}
               placeholder="Type here"
               className="input input-bordered "
             />
+            {errors.email && (
+              <p className="text-red-600 text-start text-sm" role="alert">
+                {errors.email?.message}
+              </p>
+            )}
           </div>
           <div className="form-control">
             <label className="label">
@@ -55,12 +87,38 @@ const Register = () => {
 
             <input
               type="password"
-              name="password"
-              required
+              {...register("password", {
+                required: true,
+                minLength: 6,
+                maxLength: 20,
+                pattern: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{6}/,
+              })}
               placeholder="Enter your password"
               className="input input-bordered"
             />
+            {errors.password?.type === "required" && (
+              <p className="text-red-600 text-start text-sm" role="alert">
+                Password is required
+              </p>
+            )}
+            {errors.password?.type === "minLength" && (
+              <p className="text-red-600 text-start text-sm" role="alert">
+                Password must be 6 character long
+              </p>
+            )}
+            {errors.password?.type === "maxLength" && (
+              <p className="text-red-600 text-start text-sm" role="alert">
+                Password must be less than 20 character long
+              </p>
+            )}
+            {errors.password?.type === "pattern" && (
+              <p className="text-red-600 text-start text-sm" role="alert">
+                Password must have one lower case, one uppercase, one number and one special
+                character
+              </p>
+            )}
           </div>
+          <p className="text-red-500">{error}</p>
           <div className="form-control pt-4">
             <button className="btn bg-[#D1A054]">Sign up</button>
           </div>
@@ -71,11 +129,11 @@ const Register = () => {
                 Go to Login
               </Link>
             </div>
-            <p>Or Sign in with</p>
+            <p>Or Sign up with</p>
             <div className="flex justify-center gap-4 text-2xl">
-              <CiFacebook />
-              <FcGoogle />
-              <VscGithub />
+              <CiFacebook className="cursor-pointer" />
+              <FcGoogle className="cursor-pointer" onClick={handleGoogleSignIn} />
+              <VscGithub className="cursor-pointer" />
             </div>
           </div>
         </form>

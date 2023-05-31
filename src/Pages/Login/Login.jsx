@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { useForm } from "react-hook-form";
+
 import {
   loadCaptchaEnginge,
   LoadCanvasTemplate,
@@ -8,13 +10,17 @@ import {
 
 import loginBanner from "../../assets/others/authentication.png";
 import login from "../../assets/others/authentication2.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CiFacebook } from "react-icons/ci";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithub } from "react-icons/vsc";
+import { AuthContext } from "../../Providers/AuthProvider";
 
 const Login = () => {
+  const { signIn, googleSignIn } = useContext(AuthContext);
   const [disable, setDisable] = useState(true);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
@@ -29,12 +35,40 @@ const Login = () => {
     }
   };
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    const email = form.email.value;
-    const password = form.password.value;
-    console.log(email, password);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = (data) => {
+    setError("");
+    signIn(data.email, data.password)
+      .then((result) => {
+        navigate("/");
+      })
+      .catch((error) => setError(error.message));
+  };
+
+  // const handleLogin = (event) => {
+  //   event.preventDefault();
+  //   const form = event.target;
+  //   const email = form.email.value;
+  //   const password = form.password.value;
+  //   console.log(email, password);
+  //   setError("");
+  //   signIn(email, password)
+  //     .then((result) => {
+  //       navigate("/");
+  //     })
+  //     .catch((error) => setError(error.message));
+  // };
+  const handleGoogleSignIn = () => {
+    googleSignIn()
+      .then((result) => {
+        navigate("/");
+      })
+      .catch((error) => setError(error.message));
   };
   return (
     <div className="hero min-h-screen " style={{ backgroundImage: `url(${loginBanner})` }}>
@@ -43,7 +77,7 @@ const Login = () => {
         style={{ backgroundImage: `url(${loginBanner})` }}
       >
         <img className="md:w-1/2" src={login} alt="" />
-        <form onSubmit={handleLogin} className="md:w-2/3 text-black space-y-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="md:w-2/3 text-black space-y-2">
           <h1 className="text-2xl text-black font-semibold uppercase"> Sign In</h1>
           <div className="form-control">
             <label className="label">
@@ -51,11 +85,16 @@ const Login = () => {
             </label>
             <input
               type="email"
-              name="email"
-              required
+              {...register("email", { required: "Email Address is required" })}
+              aria-invalid={errors.email ? "true" : "false"}
               placeholder="Type here"
               className="input input-bordered "
             />
+            {errors.email && (
+              <p className="text-start text-red-600 text-sm" role="alert">
+                {errors.email?.message}
+              </p>
+            )}
           </div>
           <div className="form-control">
             <label className="label">
@@ -64,11 +103,15 @@ const Login = () => {
 
             <input
               type="password"
-              name="password"
-              required
+              {...register("password", { required: "Password is required " })}
               placeholder="Enter your password"
               className="input input-bordered"
             />
+            {errors.password && (
+              <p className="text-start text-red-600 text-sm" role="alert">
+                {errors.password?.message}
+              </p>
+            )}
           </div>
           <div className="form-control">
             <label className="text-start w-3/4">
@@ -82,6 +125,7 @@ const Login = () => {
               className="input input-bordered my-3"
             />
           </div>
+          <p className="text-red-500">{error}</p>
           <div className="form-control mt-6">
             <button disabled={disable} className="btn bg-[#D1A054]">
               Sign in
@@ -97,7 +141,7 @@ const Login = () => {
             <p>Or Sign in with</p>
             <div className="flex justify-center gap-4 text-2xl">
               <CiFacebook />
-              <FcGoogle />
+              <FcGoogle onClick={handleGoogleSignIn} />
               <VscGithub />
             </div>
           </div>
