@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import loginBanner from "../../assets/others/authentication.png";
 import login from "../../assets/others/authentication2.png";
 import { CiFacebook } from "react-icons/ci";
@@ -13,6 +13,8 @@ const Register = () => {
   const { createUser, profileUpdate, googleSignIn } = useContext(AuthContext);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  let from = location.state?.from?.pathname || "/";
   const {
     register,
     handleSubmit,
@@ -24,7 +26,13 @@ const Register = () => {
       .then((result) => {
         profileUpdate(data.name)
           .then((result) => {
-            navigate("/");
+            Swal.fire({
+              title: "Success!",
+              text: "Successfully Sign up",
+              icon: "success",
+              confirmButtonText: "Ok",
+            });
+            navigate("/login");
           })
           .catch((error) => setError(error.message));
       })
@@ -34,7 +42,7 @@ const Register = () => {
   const handleGoogleSignIn = () => {
     googleSignIn()
       .then((result) => {
-        navigate("/");
+        navigate(from, { replace: true });
       })
       .catch((error) => setError(error.message));
   };

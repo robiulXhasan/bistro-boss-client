@@ -1,26 +1,24 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useForm } from "react-hook-form";
 
-import {
-  loadCaptchaEnginge,
-  LoadCanvasTemplate,
-  LoadCanvasTemplateNoReload,
-  validateCaptcha,
-} from "react-simple-captcha";
+import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from "react-simple-captcha";
 
 import loginBanner from "../../assets/others/authentication.png";
 import login from "../../assets/others/authentication2.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CiFacebook } from "react-icons/ci";
 import { FcGoogle } from "react-icons/fc";
 import { VscGithub } from "react-icons/vsc";
 import { AuthContext } from "../../Providers/AuthProvider";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const { signIn, googleSignIn } = useContext(AuthContext);
   const [disable, setDisable] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  let from = location.state?.from?.pathname || "/";
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
@@ -45,28 +43,21 @@ const Login = () => {
     setError("");
     signIn(data.email, data.password)
       .then((result) => {
-        navigate("/");
+        Swal.fire({
+          title: "Success!",
+          text: "Successfully Sign in",
+          icon: "success",
+          confirmButtonText: "Ok",
+        });
+        navigate(from, { replace: true });
       })
       .catch((error) => setError(error.message));
   };
 
-  // const handleLogin = (event) => {
-  //   event.preventDefault();
-  //   const form = event.target;
-  //   const email = form.email.value;
-  //   const password = form.password.value;
-  //   console.log(email, password);
-  //   setError("");
-  //   signIn(email, password)
-  //     .then((result) => {
-  //       navigate("/");
-  //     })
-  //     .catch((error) => setError(error.message));
-  // };
   const handleGoogleSignIn = () => {
     googleSignIn()
       .then((result) => {
-        navigate("/");
+        navigate(from, { replace: true });
       })
       .catch((error) => setError(error.message));
   };
