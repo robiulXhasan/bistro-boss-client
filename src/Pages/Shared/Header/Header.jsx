@@ -2,10 +2,11 @@ import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../Providers/AuthProvider";
 import { BsCart4 } from "react-icons/bs";
+import useCart from "../../../Hooks/useCart";
 
 const Header = () => {
   const { user, logOut } = useContext(AuthContext);
-  console.log(user);
+  const [cart] = useCart();
   const navigate = useNavigate();
   const handleLogOut = () => {
     logOut()
@@ -35,7 +36,7 @@ const Header = () => {
         <Link>
           <button className="flex">
             <BsCart4 className="text-2xl" />
-            <div className="badge badge-secondary -ms-4 -mt-2">+3</div>
+            <div className="badge badge-secondary -ms-4 -mt-2">+{cart?.length || 0}</div>
           </button>
         </Link>
       </li>
